@@ -16,7 +16,7 @@ export default defineConfig({
       srcDir: 'src',
       filename: 'sw.ts',
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
       manifest: {
         name: 'How You Feeling?',
         short_name: 'HYF',
@@ -32,24 +32,31 @@ export default defineConfig({
             src: `${BASE_PATH}icon-192.png`,
             sizes: '192x192',
             type: 'image/png',
+            purpose: 'any',
+          },
+          {
+            src: `${BASE_PATH}icon-192.png`,
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'maskable',
           },
           {
             src: `${BASE_PATH}icon-512.png`,
             sizes: '512x512',
             type: 'image/png',
+            purpose: 'any',
           },
           {
             src: `${BASE_PATH}icon-512.png`,
             sizes: '512x512',
             type: 'image/png',
-            purpose: 'any maskable',
+            purpose: 'maskable',
           },
         ],
       },
       injectManifest: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2,webmanifest}'],
       },
-      base: BASE_PATH,
     }),
   ],
   resolve: {

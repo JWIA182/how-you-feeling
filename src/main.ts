@@ -1,22 +1,4 @@
-import './assets/main.css'
-
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
-import App from './App.vue'
-import { useAuthStore } from './stores/auth'
-import { useDaylioStore } from './stores/mood'
-import './firebase'
-
-const pinia = createPinia()
-const app = createApp(App)
-
-app.use(pinia)
-app.mount('#app')
-
-// Sync Firestore when user logs in
-const auth = useAuthStore()
-const store = useDaylioStore()
-
+// PWA: Register service worker FIRST
 import { registerSW } from 'virtual:pwa-register'
 
 const updateSW = registerSW({
@@ -33,10 +15,12 @@ const updateSW = registerSW({
       transform: translateX(-50%);
       background: #000;
       color: #fff;
-      padding: 0.75rem 1rem;
-      border-radius: 4px;
+      padding: 0.5rem 1rem;
+      border: 1px solid #000;
       font-family: 'Courier New', monospace;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
       display: flex;
       align-items: center;
       gap: 0.75rem;
@@ -44,25 +28,25 @@ const updateSW = registerSW({
       box-shadow: 2px 2px 0 #666;
     `
     bar.innerHTML = `
-      <span>update available</span>
+      <span>update</span>
       <button id="pwa-reload" style="
         background: #fff;
         color: #000;
         border: none;
-        padding: 0.25rem 0.75rem;
+        padding: 0.25rem 0.5rem;
         font-family: inherit;
-        font-size: 0.7rem;
+        font-size: 0.65rem;
         cursor: pointer;
         text-transform: uppercase;
         font-weight: 700;
       ">reload</button>
       <button id="pwa-close" style="
         background: none;
-        border: none;
+        border: 1px solid #666;
         color: #666;
-        font-size: 1rem;
+        font-size: 0.65rem;
         cursor: pointer;
-        padding: 0.25rem;
+        padding: 0.15rem 0.375rem;
       ">x</button>
     `
     document.body.appendChild(bar)
@@ -76,6 +60,25 @@ const updateSW = registerSW({
     })
   },
   onOfflineReady() {
-    console.log('[PWA] App ready for offline use')
+    console.log('[PWA] ready for offline')
   },
 })
+
+// App
+import './assets/main.css'
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
+import App from './App.vue'
+import { useAuthStore } from './stores/auth'
+import { useDaylioStore } from './stores/mood'
+import './firebase'
+
+const pinia = createPinia()
+const app = createApp(App)
+
+app.use(pinia)
+app.mount('#app')
+
+// Sync Firestore when user logs in
+const auth = useAuthStore()
+const store = useDaylioStore()

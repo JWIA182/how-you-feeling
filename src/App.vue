@@ -15,6 +15,12 @@ const store = useDaylioStore()
 const auth = useAuthStore()
 
 onMounted(() => {
+  // Handle redirect from 404.html
+  const redirect = sessionStorage.getItem('redirect')
+  if (redirect) {
+    sessionStorage.removeItem('redirect')
+  }
+
   if (store.darkMode) {
     document.body.classList.add('dark-mode')
   }
