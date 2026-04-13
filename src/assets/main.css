@@ -5,6 +5,8 @@
   padding: 0;
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
+  -webkit-text-fill-color: currentColor;
+  color: inherit;
 }
 
 body {
@@ -22,22 +24,13 @@ body {
 }
 
 /* Safe area for iPhone (Dynamic Island + Home Indicator) */
-@supports (padding: env(safe-area-inset-bottom)) {
-  #app {
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: calc(env(safe-area-inset-bottom) + 4rem);
-  }
-
-  .bottom-nav {
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-}
-
-@media (max-width: 430px) {
-  #app {
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
-  }
+#app {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0.75rem;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 4rem);
+  min-height: 100dvh;
+  -webkit-overflow-scrolling: touch;
 }
 
 body.dark-mode {
@@ -56,6 +49,7 @@ body.dark-mode .history-item,
 body.dark-mode .activity-impact {
   background: #000;
   border-color: #fff;
+  color: #fff;
 }
 
 body.dark-mode .mood-btn,
@@ -70,6 +64,12 @@ body.dark-mode .mood-btn.selected,
 body.dark-mode .activity-btn.selected {
   background: #fff;
   color: #000;
+}
+
+body.dark-mode input,
+body.dark-mode textarea,
+body.dark-mode select {
+  -webkit-text-fill-color: #fff;
 }
 
 body.dark-mode .note-section textarea {
@@ -215,20 +215,12 @@ body.dark-mode .mood-indicator .dot.filled {
   background: #fff;
 }
 
-#app {
-  max-width: 480px;
-  margin: 0 auto;
-  padding: 0.75rem;
-  min-height: 100vh;
-  min-height: 100dvh;
-  -webkit-overflow-scrolling: touch;
-}
-
 /* iPhone 16 Pro Max optimization */
 @media (max-width: 430px) {
   #app {
     max-width: 100%;
     padding: 0.5rem;
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 4rem);
   }
 
   .mood-grid {
@@ -320,6 +312,7 @@ section {
   padding: 0.75rem;
   margin-bottom: 0.75rem;
   background: #fff;
+  color: #000;
 }
 
 section h2 {
@@ -330,6 +323,7 @@ section h2 {
   font-weight: 700;
   border-bottom: 1px solid #000;
   padding-bottom: 0.25rem;
+  color: #000;
 }
 
 /* Mood Grid */
@@ -427,6 +421,11 @@ section h2 {
   font-size: 1.1rem;
 }
 
+input, textarea, select, button {
+  font-family: inherit;
+  -webkit-text-fill-color: inherit;
+}
+
 /* Note */
 .note-section textarea {
   width: 100%;
@@ -439,6 +438,9 @@ section h2 {
   background: #fff;
   color: #000;
   outline: none;
+  -webkit-appearance: none;
+  -webkit-text-fill-color: #000;
+  -webkit-border-radius: 0;
 }
 
 .note-section textarea:focus {
@@ -488,8 +490,7 @@ section h2 {
   border-top: 2px solid #000;
   display: flex;
   justify-content: space-around;
-  padding: 0.5rem 0;
-  padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px));
+  padding: 0.5rem 0 env(safe-area-inset-bottom, 0px);
   z-index: 100;
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
