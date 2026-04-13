@@ -49,6 +49,7 @@ export default defineConfig({
       injectManifest: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
       },
+      base: BASE_PATH,
     }),
   ],
   resolve: {
