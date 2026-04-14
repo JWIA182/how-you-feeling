@@ -69,8 +69,6 @@ import './assets/main.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from './App.vue'
-import { useAuthStore } from './stores/auth'
-import { useDaylioStore } from './stores/mood'
 import './firebase'
 
 const pinia = createPinia()
@@ -78,7 +76,3 @@ const app = createApp(App)
 
 app.use(pinia)
 app.mount('#app')
-
-// Sync Firestore when user logs in
-const auth = useAuthStore()
-const store = useDaylioStore()

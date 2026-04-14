@@ -315,6 +315,74 @@ body.dark-mode .mood-indicator .dot.filled {
   color: #fff;
 }
 
+.sync-status {
+  display: flex;
+  align-items: center;
+  margin-right: 0.25rem;
+}
+
+.offline-indicator,
+.sync-indicator {
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #000;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.offline-indicator {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Loading Skeleton */
+.loading-skeleton {
+  padding: 1rem 0;
+}
+
+.skeleton-bar {
+  height: 20px;
+  background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  margin-bottom: 0.5rem;
+  border: 1px solid #ccc;
+}
+
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.5rem;
+}
+
+.skeleton-card {
+  height: 60px;
+  background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  border: 1px solid #ccc;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+body.dark-mode .skeleton-bar,
+body.dark-mode .skeleton-card {
+  background: linear-gradient(90deg, #333 25%, #444 50%, #333 75%);
+  background-size: 200% 100%;
+  border-color: #666;
+}
+
 /* Section */
 section {
   border: 1px solid #000;
@@ -460,9 +528,14 @@ input, textarea, select, button {
   color: #666;
 }
 
-/* Save Button */
-.save-btn {
-  width: 100%;
+.button-group {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.cancel-btn {
+  flex: 1;
   padding: 0.625rem;
   background: #fff;
   color: #000;
@@ -473,7 +546,26 @@ input, textarea, select, button {
   letter-spacing: 2px;
   font-weight: 700;
   cursor: pointer;
-  margin-top: 0.5rem;
+}
+
+.cancel-btn:hover {
+  background: #000;
+  color: #fff;
+}
+
+/* Save Button */
+.save-btn {
+  flex: 1;
+  padding: 0.625rem;
+  background: #fff;
+  color: #000;
+  border: 1px solid #000;
+  font-family: inherit;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .save-btn:hover:not(:disabled) {
@@ -553,6 +645,37 @@ input, textarea, select, button {
 }
 
 /* History */
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.export-btn {
+  background: #fff;
+  color: #000;
+  border: 1px solid #000;
+  font-family: inherit;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.export-btn:hover {
+  background: #000;
+  color: #fff;
+}
+
+.export-btn:active {
+  transform: scale(0.95);
+}
+
 .mood-history {
   display: flex;
   flex-direction: column;
@@ -643,6 +766,35 @@ input, textarea, select, button {
 }
 
 .delete-btn:hover {
+  background: #000;
+  color: #fff;
+}
+
+.edit-btn {
+  background: none;
+  border: 1px solid #000;
+  color: #000;
+  min-width: 44px;
+  min-height: 44px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-appearance: none;
+  touch-action: manipulation;
+}
+
+.edit-btn:active {
+  background: #000;
+  color: #fff;
+  transform: scale(0.95);
+}
+
+.edit-btn:hover {
   background: #000;
   color: #fff;
 }
@@ -900,6 +1052,46 @@ input, textarea, select, button {
   z-index: 1000;
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
+}
+
+.undo-toast {
+  position: fixed;
+  bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  background: #000;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  font-family: inherit;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.undo-btn {
+  background: #fff;
+  color: #000;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  font-family: inherit;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+.undo-btn:hover {
+  background: #ccc;
+}
+
+.undo-btn:active {
+  transform: scale(0.95);
 }
 
 .toast-enter-active,

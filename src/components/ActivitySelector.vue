@@ -2,6 +2,17 @@
 import { useDaylioStore } from '@/stores/mood'
 
 const store = useDaylioStore()
+
+function triggerHaptic() {
+  if ('vibrate' in navigator) {
+    navigator.vibrate(10)
+  }
+}
+
+function toggleActivityWithHaptic(id: string) {
+  triggerHaptic()
+  store.toggleActivity(id)
+}
 </script>
 
 <template>
@@ -13,7 +24,7 @@ const store = useDaylioStore()
         :key="activity.id"
         class="activity-btn"
         :class="{ selected: store.selectedActivities.includes(activity.id) }"
-        @click="store.toggleActivity(activity.id)"
+        @click="toggleActivityWithHaptic(activity.id)"
       >
         <span class="emoji">{{ activity.emoji }}</span>
         <span class="label">{{ activity.name }}</span>

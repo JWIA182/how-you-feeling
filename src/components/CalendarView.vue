@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useDaylioStore, MOODS } from '@/stores/mood'
+import { useDaylioStore, MOODS, type MoodEntry } from '@/stores/mood'
 
 const store = useDaylioStore()
 
@@ -15,7 +15,7 @@ const calendarData = computed(() => {
   const startDate = new Date(firstDay)
   startDate.setDate(startDate.getDate() - startDate.getDay())
 
-  const days: { date: Date; entries: any[]; isCurrentMonth: boolean; isToday: boolean }[] = []
+  const days: { date: Date; entries: MoodEntry[]; isCurrentMonth: boolean; isToday: boolean }[] = []
 
   const today = new Date()
   today.setHours(0, 0, 0, 0)
@@ -54,6 +54,8 @@ const monthName = computed(() => {
 
 const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
+const streak = computed(() => store.getStreak())
+
 function prevMonth() {
   currentDate.value = new Date(
     currentDate.value.getFullYear(),
@@ -70,7 +72,7 @@ function nextMonth() {
   )
 }
 
-function getAvgMoodColor(entries: any[]) {
+function getAvgMoodColor(entries: MoodEntry[]) {
   if (entries.length === 0) return 'transparent'
   const avg = entries.reduce((sum, e) => sum + e.mood.value, 0) / entries.length
   const idx = Math.round(avg) - 1
@@ -135,8 +137,9 @@ function getDayOfMonth(date: Date) {
         STR
       </div>
       <div class="streak-info">
-        <h4>streak</h4>
-        <p>log daily to build one</p>
+        <h4>streak: {{ streak.current }}d</h4>
+        <p v-if="streak.current === 0">log daily to build one</p>
+        <p v-else>best: {{ streak.longest }}d</p>
       </div>
     </div>
   </div>

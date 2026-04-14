@@ -17,11 +17,9 @@ import {
   where,
   orderBy,
   getDocs,
-  type DocumentData,
 } from 'firebase/firestore'
 import { auth, db, googleProvider } from '@/firebase'
-import type { Mood, MoodEntry, Activity } from '@/stores/mood'
-import { MOODS, ACTIVITIES, STORAGE_KEY } from '@/stores/mood'
+import type { MoodEntry } from '@/stores/mood'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)

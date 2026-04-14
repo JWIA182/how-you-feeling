@@ -2,7 +2,6 @@
 import { writeFileSync, readFileSync } from 'fs'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
-import { createHash } from 'crypto'
 import { deflateSync } from 'zlib'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))

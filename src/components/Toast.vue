@@ -1,4 +1,8 @@
 <script setup lang="ts">
+defineOptions({
+  name: 'NotificationToast',
+})
+
 defineProps<{
   message: string
   show: boolean

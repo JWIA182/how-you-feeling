@@ -85,6 +85,9 @@ export const useDaylioStore = defineStore('daylio', () => {
   const activeTab = ref('entry') // entry | calendar | stats | goals
   const darkMode = ref(loadDark())
   const themeColor = ref(loadTheme())
+  const editingEntry = ref<MoodEntry | null>(null)
+  const isOnline = ref(navigator.onLine)
+  const pendingSync = ref<MoodEntry[]>([])
 
   const canSave = computed(() => selectedMood.value !== null)
 
@@ -105,19 +108,45 @@ export const useDaylioStore = defineStore('daylio', () => {
     if (!selectedMood.value) return null
 
     const entry: MoodEntry = {
-      id: Date.now(),
+      id: editingEntry.value ? editingEntry.value.id : Date.now(),
       mood: selectedMood.value,
       activities: [...selectedActivities.value],
       note: note.value,
-      timestamp: new Date().toISOString(),
+      timestamp: editingEntry.value ? editingEntry.value.timestamp : new Date().toISOString(),
     }
 
-    history.value.unshift(entry)
+    if (editingEntry.value) {
+      // Update existing entry
+      const idx = history.value.findIndex((e) => e.id === editingEntry.value!.id)
+      if (idx !== -1) {
+        history.value[idx] = entry
+      }
+      editingEntry.value = null
+    } else {
+      // Create new entry
+      history.value.unshift(entry)
+    }
+    
     saveHistory(history.value)
     selectedMood.value = null
     selectedActivities.value = []
     note.value = ''
     return entry
+  }
+
+  function editEntry(entry: MoodEntry) {
+    editingEntry.value = entry
+    selectedMood.value = entry.mood
+    selectedActivities.value = [...entry.activities]
+    note.value = entry.note
+    activeTab.value = 'entry'
+  }
+
+  function cancelEdit() {
+    editingEntry.value = null
+    selectedMood.value = null
+    selectedActivities.value = []
+    note.value = ''
   }
 
   function deleteEntry(id: number) {
@@ -172,6 +201,63 @@ export const useDaylioStore = defineStore('daylio', () => {
     return map
   }
 
+  function getStreak(): { current: number; longest: number } {
+    if (history.value.length === 0) return { current: 0, longest: 0 }
+
+    const uniqueDays = new Set<string>()
+    for (const entry of history.value) {
+      const date = new Date(entry.timestamp).toLocaleDateString('en-CA')
+      uniqueDays.add(date)
+    }
+
+    const sortedDays = Array.from(uniqueDays).sort().reverse()
+    
+    // Calculate current streak
+    let currentStreak = 0
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    
+    for (let i = 0; i < 365; i++) {
+      const checkDate = new Date(today)
+      checkDate.setDate(checkDate.getDate() - i)
+      const dateStr = checkDate.toLocaleDateString('en-CA')
+      
+      if (uniqueDays.has(dateStr)) {
+        currentStreak++
+      } else if (i > 0) {
+        // Allow today to not be logged yet, but break streak if any other day is missing
+        break
+      }
+    }
+
+    // Calculate longest streak
+    let longestStreak = 0
+    let tempStreak = 0
+    let lastDate: Date | null = null
+
+    for (const dateStr of sortedDays) {
+      const currentDate = new Date(dateStr)
+      
+      if (lastDate) {
+        const diffTime = currentDate.getTime() - lastDate.getTime()
+        const diffDays = diffTime / (1000 * 60 * 60 * 24)
+        
+        if (diffDays === 1) {
+          tempStreak++
+        } else {
+          tempStreak = 1
+        }
+      } else {
+        tempStreak = 1
+      }
+      
+      longestStreak = Math.max(longestStreak, tempStreak)
+      lastDate = currentDate
+    }
+
+    return { current: currentStreak, longest: longestStreak }
+  }
+
   function toggleDark() {
     darkMode.value = !darkMode.value
     localStorage.setItem(DARK_KEY, String(darkMode.value))
@@ -186,6 +272,46 @@ export const useDaylioStore = defineStore('daylio', () => {
     activeTab.value = tab
   }
 
+  function addToPendingSync(entry: MoodEntry) {
+    pendingSync.value.push(entry)
+  }
+
+  function clearPendingSync() {
+    pendingSync.value = []
+  }
+
+  function exportToCSV() {
+    if (history.value.length === 0) return
+
+    const headers = ['Date', 'Time', 'Mood', 'Mood Value', 'Activities', 'Note']
+    const rows = history.value.map((entry) => {
+      const date = new Date(entry.timestamp)
+      const dateStr = date.toLocaleDateString('en-CA')
+      const timeStr = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+      const activities = entry.activities
+        .map((actId) => ACTIVITIES.find((a) => a.id === actId)?.emoji ?? actId)
+        .join(', ')
+      
+      return [
+        dateStr,
+        timeStr,
+        entry.mood.name,
+        entry.mood.value,
+        activities,
+        `"${entry.note.replace(/"/g, '""')}"`,
+      ]
+    })
+
+    const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n')
+    const blob = new Blob([csvContent], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `mood-data-${new Date().toISOString().split('T')[0]}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   return {
     history,
     selectedMood,
@@ -194,6 +320,9 @@ export const useDaylioStore = defineStore('daylio', () => {
     activeTab,
     darkMode,
     themeColor,
+    editingEntry,
+    isOnline,
+    pendingSync,
     moods: MOODS,
     activities: ACTIVITIES,
     canSave,
@@ -202,12 +331,19 @@ export const useDaylioStore = defineStore('daylio', () => {
     saveEntry,
     deleteEntry,
     clearHistory,
+    editEntry,
+    cancelEdit,
     getMoodCount,
     getActivityImpact,
     getMostCommonMood,
     getCalendarData,
+    getStreak,
     toggleDark,
     setTheme,
     setTab,
+    addToPendingSync,
+    clearPendingSync,
+    exportToCSV,
+    saveHistory,
   }
 })
